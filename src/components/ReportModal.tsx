@@ -7,12 +7,11 @@ import {
   ThumbsDown,
   Upload,
   CheckCircle2,
-  AlertTriangle,
   Sparkles,
   ArrowRight,
-  Info,
 } from 'lucide-react';
 import { Bridge, CitizenReport } from '../types';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -29,6 +28,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
   preselectedBridgeId,
   onSubmitReport,
 }) => {
+  const { t } = useLanguage();
   const [selectedBridgeId, setSelectedBridgeId] = useState<string>('');
   const [thumbs, setThumbs] = useState<'up' | 'down'>('down');
   const [issueCategory, setIssueCategory] = useState<CitizenReport['issueCategory']>('Cracking / Spalling');
@@ -68,9 +68,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
 
   const handleAutoLocateNearest = () => {
     setIsLocating(true);
-    // Simulate finding nearest bridge using user coordinates
     setTimeout(() => {
-      // Pick nearest bridge (e.g. br-101 or first one)
       setSelectedBridgeId(bridges[0].id);
       setIsLocating(false);
     }, 600);
@@ -125,8 +123,8 @@ export const ReportModal: React.FC<ReportModalProps> = ({
               <Camera className="h-4 w-4" />
             </div>
             <div>
-              <h2 className="font-bold text-base text-white">Report Bridge Condition</h2>
-              <p className="text-xs text-slate-400">Crowdsourced observations update the live risk score</p>
+              <h2 className="font-bold text-base text-white">{t('modalTitle')}</h2>
+              <p className="text-xs text-slate-400">{t('modalSub')}</p>
             </div>
           </div>
           <button
@@ -143,13 +141,12 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             <div className="h-16 w-16 mx-auto rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center animate-bounce">
               <CheckCircle2 className="h-8 w-8" />
             </div>
-            <h3 className="text-xl font-bold text-white">Report Logged Successfully!</h3>
+            <h3 className="text-xl font-bold text-white">{t('reportSuccessTitle')}</h3>
             <p className="text-sm text-slate-300 max-w-md mx-auto">
-              Your observation for <span className="text-amber-400 font-semibold">{currentBridge?.name}</span> has been
-              submitted. The Risk Score Algorithm has recalculated the live hazard rating!
+              <span className="text-amber-400 font-semibold">{currentBridge?.name}</span> {t('reportSuccessSub')}
             </p>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-full text-xs font-semibold">
-              <Sparkles className="h-3.5 w-3.5" /> +50 Community Safety Points Awarded
+              <Sparkles className="h-3.5 w-3.5" /> {t('pointsAwarded')}
             </div>
           </div>
         ) : (
@@ -158,14 +155,14 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <label className="font-semibold text-slate-200 flex items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5 text-amber-400" /> Target Bridge Location
+                  <MapPin className="h-3.5 w-3.5 text-amber-400" /> {t('targetBridgeLocation')}
                 </label>
                 <button
                   type="button"
                   onClick={handleAutoLocateNearest}
                   className="text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
                 >
-                  {isLocating ? 'Detecting nearest GPS...' : 'Auto-Detect Nearest Bridge'}
+                  {isLocating ? t('detectingGps') : t('autoDetectNearest')}
                 </button>
               </div>
 
@@ -176,7 +173,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
               >
                 {bridges.map((b) => (
                   <option key={b.id} value={b.id}>
-                    {b.name} ({b.riverOrCrossing} • Current Risk: {b.riskScore}/100)
+                    {b.name} ({b.riverOrCrossing} • {t('score')}: {b.riskScore}/100)
                   </option>
                 ))}
               </select>
@@ -185,7 +182,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             {/* Step 2: Thumbs Up / Thumbs Down Condition Assessment */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-slate-200">
-                Condition Assessment (Thumbs Up / Down)
+                {t('conditionAssessment')}
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <button
@@ -198,9 +195,9 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                   }`}
                 >
                   <ThumbsDown className="h-7 w-7 text-rose-500" />
-                  <span className="font-bold text-sm text-white">Problem Observed</span>
+                  <span className="font-bold text-sm text-white">{t('problemObserved')}</span>
                   <span className="text-[11px] text-slate-400 text-center">
-                    Cracks, flood surge, deep potholes, or structural sway
+                    {t('problemObservedSub')}
                   </span>
                 </button>
 
@@ -214,9 +211,9 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                   }`}
                 >
                   <ThumbsUp className="h-7 w-7 text-emerald-500" />
-                  <span className="font-bold text-sm text-white">Looks Sound & Safe</span>
+                  <span className="font-bold text-sm text-white">{t('looksSoundSafe')}</span>
                   <span className="text-[11px] text-slate-400 text-center">
-                    Smooth passage, dry pavement, normal water clearance
+                    {t('looksSoundSafeSub')}
                   </span>
                 </button>
               </div>
@@ -225,7 +222,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             {/* Step 3: Hazard Category (If Thumbs Down) */}
             {thumbs === 'down' && (
               <div className="space-y-2 animate-in fade-in duration-150">
-                <label className="block text-xs font-semibold text-slate-200">Type of Hazard Observed</label>
+                <label className="block text-xs font-semibold text-slate-200">{t('hazardTypeLabel')}</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {(
                     [
@@ -258,9 +255,9 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <label className="font-semibold text-slate-200 flex items-center gap-1.5">
-                  <Camera className="h-3.5 w-3.5 text-amber-400" /> Photographic Evidence (Higher Trust Bonus)
+                  <Camera className="h-3.5 w-3.5 text-amber-400" /> {t('photoEvidenceLabel')}
                 </label>
-                <span className="text-[11px] text-slate-400">+10 Confidence Score</span>
+                <span className="text-[11px] text-slate-400">{t('photoTrustBonus')}</span>
               </div>
 
               {photoUrl ? (
@@ -278,14 +275,14 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                 <div className="space-y-2">
                   <label className="border-2 border-dashed border-slate-800 hover:border-amber-500/50 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors bg-slate-950/40">
                     <Upload className="h-6 w-6 text-slate-400" />
-                    <span className="text-xs text-slate-300 font-medium">Click to upload photo or capture camera</span>
-                    <span className="text-[10px] text-slate-500">Supports JPG, PNG, WEBP up to 10MB</span>
+                    <span className="text-xs text-slate-300 font-medium">{t('uploadPrompt')}</span>
+                    <span className="text-[10px] text-slate-500">{t('uploadSpecs')}</span>
                     <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
                   </label>
 
                   {/* Quick sample photo selector for prototype demonstration */}
                   <div className="pt-1">
-                    <span className="text-[10px] text-slate-400 font-medium">Or pick a demo evidence photo:</span>
+                    <span className="text-[10px] text-slate-400 font-medium">{t('demoPhotoPrompt')}</span>
                     <div className="flex items-center gap-2 mt-1">
                       {SAMPLE_PHOTOS.map((p) => (
                         <button
@@ -306,7 +303,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             {/* Step 5: Comment */}
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-slate-200">
-                Additional Observations / Landmark Notes
+                {t('additionalNotes')}
               </label>
               <textarea
                 value={comment}
@@ -323,7 +320,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
 
             {/* Reporter Role Selector */}
             <div className="flex items-center justify-between text-xs pt-1">
-              <span className="text-slate-400">Submitting as:</span>
+              <span className="text-slate-400">{t('submittingAs')}</span>
               <div className="flex items-center gap-2">
                 {(['Citizen', 'Truck Driver', 'Bus Transit'] as const).map((role) => (
                   <button
@@ -348,7 +345,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                 type="submit"
                 className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-rose-500 to-rose-600 text-slate-950 font-bold text-sm shadow-lg shadow-rose-500/25 hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span>Submit Bridge Report</span>
+                <span>{t('submitReportBtn')}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>

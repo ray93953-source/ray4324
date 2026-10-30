@@ -13,6 +13,8 @@ import {
   Building2,
 } from 'lucide-react';
 import { UserPersonalMetrics } from '../types';
+import { useLanguage } from '../i18n/LanguageContext';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface HeaderProps {
   currentTab: 'dashboard' | 'map' | 'routes' | 'authority' | 'alerts';
@@ -35,6 +37,8 @@ export const Header: React.FC<HeaderProps> = ({
   criticalBridgesCount,
   activeAlertsCount,
 }) => {
+  const { t } = useLanguage();
+
   return (
     <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
       {/* Top Alert Ticker */}
@@ -45,23 +49,23 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
             </span>
-            <span className="font-semibold text-rose-300">LIVE RIVER WARNING:</span>
+            <span className="font-semibold text-rose-300">{t('liveAlertPrefix')}</span>
             <span>
-              CWC & IMD Flash Flood Alert Active – {criticalBridgesCount} bridges currently flagged with elevated risk!
+              {t('liveAlertText')} ({criticalBridgesCount})
             </span>
           </div>
           <button
             onClick={() => setCurrentTab('alerts')}
             className="flex-shrink-0 ml-3 underline hover:text-white font-medium cursor-pointer"
           >
-            View Alert Zones →
+            {t('viewAlertZones')}
           </button>
         </div>
       )}
 
       {/* Main Header Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+        <div className="flex items-center justify-between h-16 gap-3 sm:gap-4">
           {/* Logo & Identity */}
           <div className="flex items-center gap-3">
             <button
@@ -76,14 +80,14 @@ export const Header: React.FC<HeaderProps> = ({
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-base sm:text-lg tracking-tight text-white group-hover:text-amber-400 transition-colors">
-                    BridgeRisk<span className="text-amber-400">Map</span>
+                    {t('appName')}<span className="text-amber-400">{t('appSuffix')}</span>
                   </span>
                   <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded">
-                    LIVE
+                    {t('live')}
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-400 hidden sm:block">
-                  Crowd-Informed Bridge Heatmap & Safe Routing
+                  {t('tagline')}
                 </p>
               </div>
             </button>
@@ -99,7 +103,7 @@ export const Header: React.FC<HeaderProps> = ({
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
-              Dashboard
+              {t('dashboard')}
             </button>
             <button
               onClick={() => setCurrentTab('map')}
@@ -110,7 +114,7 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               <MapPin className="h-3.5 w-3.5" />
-              Risk Heatmap
+              {t('riskHeatmap')}
             </button>
             <button
               onClick={() => setCurrentTab('routes')}
@@ -121,7 +125,7 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               <Navigation className="h-3.5 w-3.5" />
-              Safe Routes
+              {t('safeRoutes')}
             </button>
             <button
               onClick={() => setCurrentTab('authority')}
@@ -132,7 +136,7 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               <Building2 className="h-3.5 w-3.5" />
-              Authority Triage
+              {t('authorityTriage')}
               {criticalBridgesCount > 0 && (
                 <span className="px-1.5 py-0.2 text-[10px] bg-rose-500 text-white rounded-full font-bold">
                   {criticalBridgesCount}
@@ -148,7 +152,7 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               <Radio className="h-3.5 w-3.5" />
-              Alerts
+              {t('alerts')}
               {activeAlertsCount > 0 && (
                 <span className="px-1.5 py-0.2 text-[10px] bg-amber-500 text-slate-950 rounded-full font-bold">
                   {activeAlertsCount}
@@ -157,8 +161,11 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </nav>
 
-          {/* Right Area: Role Selector & Action */}
-          <div className="flex items-center gap-2.5">
+          {/* Right Area: Language Switcher, Role Selector & Action */}
+          <div className="flex items-center gap-2">
+            {/* Language Switcher Dropdown (Tamil, Bengali, Hindi, English) */}
+            <LanguageSwitcher />
+
             {/* Quick Role Switcher */}
             <div className="hidden lg:flex items-center bg-slate-950/70 border border-slate-800 rounded-lg p-0.5 text-xs">
               <button
@@ -171,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
                 title="Citizen Contributor View"
               >
                 <UserCheck className="h-3 w-3" />
-                Citizen
+                {t('citizen')}
               </button>
               <button
                 onClick={() => setActiveRole('driver')}
@@ -183,7 +190,7 @@ export const Header: React.FC<HeaderProps> = ({
                 title="Professional Driver / Logistics View"
               >
                 <Truck className="h-3 w-3" />
-                Driver
+                {t('driver')}
               </button>
               <button
                 onClick={() => setActiveRole('authority')}
@@ -195,12 +202,12 @@ export const Header: React.FC<HeaderProps> = ({
                 title="PWD / Disaster Authority View"
               >
                 <Building2 className="h-3 w-3" />
-                Authority
+                {t('authority')}
               </button>
             </div>
 
             {/* Personalized User Status Pill */}
-            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 bg-slate-800/60 border border-slate-700/60 rounded-lg text-xs">
+            <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 bg-slate-800/60 border border-slate-700/60 rounded-lg text-xs">
               <div className="h-6 w-6 rounded-full bg-gradient-to-tr from-amber-500 to-indigo-500 flex items-center justify-center font-bold text-[10px] text-slate-950">
                 {userMetrics.avatar}
               </div>
@@ -218,10 +225,10 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Primary Action: Report Bridge Condition */}
             <button
               onClick={onOpenReport}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 via-rose-500 to-rose-600 text-slate-950 font-semibold text-xs shadow-lg shadow-rose-500/25 hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 via-rose-500 to-rose-600 text-slate-950 font-semibold text-xs shadow-lg shadow-rose-500/25 hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer whitespace-nowrap"
             >
               <AlertTriangle className="h-3.5 w-3.5" />
-              <span>Report Condition</span>
+              <span>{t('reportCondition')}</span>
             </button>
           </div>
         </div>
@@ -234,7 +241,7 @@ export const Header: React.FC<HeaderProps> = ({
               currentTab === 'dashboard' ? 'bg-amber-500 text-slate-950 font-semibold' : 'text-slate-400'
             }`}
           >
-            Dashboard
+            {t('dashboard')}
           </button>
           <button
             onClick={() => setCurrentTab('map')}
@@ -242,7 +249,7 @@ export const Header: React.FC<HeaderProps> = ({
               currentTab === 'map' ? 'bg-amber-500 text-slate-950 font-semibold' : 'text-slate-400'
             }`}
           >
-            Heatmap
+            {t('riskHeatmap')}
           </button>
           <button
             onClick={() => setCurrentTab('routes')}
@@ -250,7 +257,7 @@ export const Header: React.FC<HeaderProps> = ({
               currentTab === 'routes' ? 'bg-amber-500 text-slate-950 font-semibold' : 'text-slate-400'
             }`}
           >
-            Safe Routes
+            {t('safeRoutes')}
           </button>
           <button
             onClick={() => setCurrentTab('authority')}
@@ -258,7 +265,7 @@ export const Header: React.FC<HeaderProps> = ({
               currentTab === 'authority' ? 'bg-amber-500 text-slate-950 font-semibold' : 'text-slate-400'
             }`}
           >
-            Authority ({criticalBridgesCount})
+            {t('authorityTriage')} ({criticalBridgesCount})
           </button>
           <button
             onClick={() => setCurrentTab('alerts')}
@@ -266,7 +273,7 @@ export const Header: React.FC<HeaderProps> = ({
               currentTab === 'alerts' ? 'bg-amber-500 text-slate-950 font-semibold' : 'text-slate-400'
             }`}
           >
-            Alerts ({activeAlertsCount})
+            {t('alerts')} ({activeAlertsCount})
           </button>
         </div>
       </div>

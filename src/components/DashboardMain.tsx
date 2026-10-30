@@ -16,17 +16,15 @@ import {
   Zap,
   Sliders,
   Droplets,
-  Calendar,
-  Layers,
   ChevronRight,
   Activity,
-  Car,
   Clock,
   Sparkles,
   Info,
 } from 'lucide-react';
 import { Bridge, CitizenReport, EnvironmentalAlert, UserPersonalMetrics } from '../types';
 import { getRiskLevelBadge } from '../utils/riskAlgorithm';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface DashboardMainProps {
   bridges: Bridge[];
@@ -53,11 +51,10 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
   onTriggerSurgeSimulation,
   isSurgeSimulated,
 }) => {
+  const { t } = useLanguage();
+
   // Aggregate stats
   const criticalBridges = bridges.filter((b) => b.riskLevel === 'critical');
-  const highRiskBridges = bridges.filter((b) => b.riskLevel === 'high');
-  const moderateBridges = bridges.filter((b) => b.riskLevel === 'moderate');
-  const lowRiskBridges = bridges.filter((b) => b.riskLevel === 'low');
   const activeAlerts = alerts.filter((a) => a.isActive);
 
   // Top 3 hotspot bridges requiring immediate attention
@@ -84,15 +81,12 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
               <span>{userMetrics.reputationLevel}</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Welcome back, <span className="text-amber-400">{userMetrics.name}</span>
+              {t('welcomeBack')}, <span className="text-amber-400">{userMetrics.name}</span>
             </h1>
             <p className="text-sm text-slate-400 max-w-xl">
-              {activeRole === 'citizen' &&
-                'Your bridge condition observations help protect thousands of daily commuters and provide real-time signals to district disaster engineers.'}
-              {activeRole === 'driver' &&
-                'Real-time bridge risk engine active. Your cargo and transit routes dynamically bypass bridges threatened by flood scour and structural degradation.'}
-              {activeRole === 'authority' &&
-                'District Command Overview: Fusing crowd-sourced thumbs/photos, flood radar water sensors, and bridge structural age into live actionable risk scores.'}
+              {activeRole === 'citizen' && t('citizenDesc')}
+              {activeRole === 'driver' && t('driverDesc')}
+              {activeRole === 'authority' && t('authorityDesc')}
             </p>
           </div>
 
@@ -107,9 +101,9 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                 <Droplets className="h-5 w-5" />
               </div>
               <div className="text-left text-xs">
-                <div className="font-semibold text-slate-200">Simulate River Surge Event</div>
+                <div className="font-semibold text-slate-200">{t('simulateSurge')}</div>
                 <div className="text-slate-400 text-[11px]">
-                  {isSurgeSimulated ? 'Torrential flood active (+25 pts)' : 'Normal dry season baseline'}
+                  {isSurgeSimulated ? t('surgeActive') : t('surgeNormal')}
                 </div>
               </div>
             </div>
@@ -121,7 +115,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                   : 'bg-slate-800 hover:bg-slate-700 text-amber-400'
               }`}
             >
-              {isSurgeSimulated ? 'Reset Baseline' : 'Trigger Surge'}
+              {isSurgeSimulated ? t('resetBaseline') : t('triggerSurge')}
             </button>
           </div>
         </div>
@@ -130,13 +124,13 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
         <div className="mt-6 pt-6 border-t border-slate-800/80">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs mb-2 gap-1">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-200">Community Safety Tier Progress:</span>
-              <span className="text-amber-400 font-bold">{userMetrics.points} / {nextTierPoints} Safety Points</span>
+              <span className="font-semibold text-slate-200">{t('safetyTierProgress')}</span>
+              <span className="text-amber-400 font-bold">{userMetrics.points} / {nextTierPoints} {t('safetyPoints')}</span>
             </div>
             <div className="text-slate-400">
               {nextTierPoints - userMetrics.points > 0
-                ? `${nextTierPoints - userMetrics.points} pts to next rank (Platinum Guardian)`
-                : 'Maximum Sentinel Tier Achieved!'}
+                ? `${nextTierPoints - userMetrics.points} ${t('ptsToNextRank')}`
+                : t('maxSentinelTier')}
             </div>
           </div>
           <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden p-0.5">
@@ -153,7 +147,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
           <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 transition-transform hover:-translate-y-0.5">
             <div className="flex items-center justify-between text-slate-400 mb-1">
               <span className="text-xs font-medium">
-                {activeRole === 'authority' ? 'Monitored Bridges' : 'Reports Submitted'}
+                {activeRole === 'authority' ? t('monitoredBridges') : t('reportsSubmitted')}
               </span>
               <FileText className="h-4 w-4 text-amber-400" />
             </div>
@@ -164,8 +158,8 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
               <TrendingUp className="h-3 w-3" />
               <span>
                 {activeRole === 'authority'
-                  ? '100% telemetry synced'
-                  : `+${Math.floor(userMetrics.reportsSubmitted * 0.3)} this week`}
+                  ? t('telemetrySynced')
+                  : `+${Math.floor(userMetrics.reportsSubmitted * 0.3)} ${t('thisWeek')}`}
               </span>
             </div>
           </div>
@@ -174,7 +168,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
           <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 transition-transform hover:-translate-y-0.5">
             <div className="flex items-center justify-between text-slate-400 mb-1">
               <span className="text-xs font-medium">
-                {activeRole === 'authority' ? 'Critical Triage Queue' : 'Verified Hazards'}
+                {activeRole === 'authority' ? t('criticalTriageQueue') : t('verifiedHazards')}
               </span>
               <AlertTriangle className="h-4 w-4 text-rose-400" />
             </div>
@@ -183,8 +177,8 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
             </div>
             <div className="text-[11px] text-slate-400 mt-1">
               {activeRole === 'authority'
-                ? 'Requires priority inspection'
-                : `${userMetrics.verifiedCount} verified by engineers`}
+                ? t('requiresPriorityInspection')
+                : `${userMetrics.verifiedCount} ${t('verifiedByEngineers')}`}
             </div>
           </div>
 
@@ -193,10 +187,10 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
             <div className="flex items-center justify-between text-slate-400 mb-1">
               <span className="text-xs font-medium">
                 {activeRole === 'driver'
-                  ? 'High-Risk Bridges Averted'
+                  ? t('riskyBridgesAverted')
                   : activeRole === 'authority'
-                  ? 'Inspection Dispatches'
-                  : 'Safe Trips Logged'}
+                  ? t('inspectionDispatches')
+                  : t('safeTripsLogged')}
               </span>
               <ShieldAlert className="h-4 w-4 text-emerald-400" />
             </div>
@@ -211,10 +205,10 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
               <CheckCircle2 className="h-3 w-3" />
               <span>
                 {activeRole === 'driver'
-                  ? 'Zero flood incidents avoided'
+                  ? t('zeroIncidents')
                   : activeRole === 'authority'
-                  ? 'Rapid field team active'
-                  : 'Safer river crossings chosen'}
+                  ? t('rapidFieldTeam')
+                  : t('saferCrossingsChosen')}
               </span>
             </div>
           </div>
@@ -224,10 +218,10 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
             <div className="flex items-center justify-between text-slate-400 mb-1">
               <span className="text-xs font-medium">
                 {activeRole === 'driver'
-                  ? 'Safe Routes Optimized'
+                  ? t('safeRoutesOptimized')
                   : activeRole === 'authority'
-                  ? 'Active Flood Alerts'
-                  : 'Community Reputation'}
+                  ? t('activeFloodAlerts')
+                  : t('communityReputation')}
               </span>
               <Zap className="h-4 w-4 text-sky-400" />
             </div>
@@ -239,7 +233,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                 : `${userMetrics.points} pts`}
             </div>
             <div className="text-[11px] text-slate-400 mt-1">
-              {activeRole === 'authority' ? 'Level 4 surge in Delta Basin' : 'Top 5% district contributor'}
+              {activeRole === 'authority' ? t('level4SurgeDelta') : t('topDistrictContributor')}
             </div>
           </div>
         </div>
@@ -249,10 +243,10 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-white tracking-tight">Quick-Access Operations</h2>
-            <p className="text-xs text-slate-400">Instant shortcuts to all primary tools and geospatial modules</p>
+            <h2 className="text-lg font-bold text-white tracking-tight">{t('quickOperations')}</h2>
+            <p className="text-xs text-slate-400">{t('quickOperationsSub')}</p>
           </div>
-          <span className="text-xs font-semibold text-amber-400">6 Core Tools</span>
+          <span className="text-xs font-semibold text-amber-400">{t('sixCoreTools')}</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -266,15 +260,15 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                 <Camera className="h-6 w-6" />
               </div>
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-slate-950">
-                1-TAP SUBMISSION
+                {t('oneTapBadge')}
               </span>
             </div>
             <h3 className="mt-4 text-base font-bold text-white group-hover:text-amber-400 transition-colors flex items-center gap-1.5">
-              <span>Report Bridge Condition</span>
+              <span>{t('reportBridgeCardTitle')}</span>
               <ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
             </h3>
             <p className="mt-1 text-xs text-slate-400 line-clamp-2">
-              Thumbs up/down assessment, auto-GPS matching to nearest bridge, and photo damage upload.
+              {t('reportBridgeCardSub')}
             </p>
           </button>
 
@@ -288,15 +282,15 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                 <MapPin className="h-6 w-6" />
               </div>
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                GIS HEATMAP
+                {t('gisBadge')}
               </span>
             </div>
             <h3 className="mt-4 text-base font-bold text-white group-hover:text-sky-400 transition-colors flex items-center gap-1.5">
-              <span>Bridge Risk Heatmap</span>
+              <span>{t('heatmapCardTitle')}</span>
               <ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
             </h3>
             <p className="mt-1 text-xs text-slate-400 line-clamp-2">
-              Explore dynamic 0–100 color-coded bridge risk markers, river surge warning polygons, and pier health scores.
+              {t('heatmapCardSub')}
             </p>
           </button>
 
@@ -310,15 +304,15 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                 <Navigation className="h-6 w-6" />
               </div>
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                SAFE ROUTING
+                {t('safeBadge')}
               </span>
             </div>
             <h3 className="mt-4 text-base font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-              <span>Safe Route Planner</span>
+              <span>{t('routesCardTitle')}</span>
               <ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
             </h3>
             <p className="mt-1 text-xs text-slate-400 line-clamp-2">
-              Plan commercial and commuter journeys with penalty routing that automatically steers away from high-risk bridges.
+              {t('routesCardSub')}
             </p>
           </button>
 
@@ -332,15 +326,15 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                 <ShieldAlert className="h-6 w-6" />
               </div>
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500 text-white">
-                {criticalBridges.length} URGENT
+                {criticalBridges.length} {t('urgentBadge')}
               </span>
             </div>
             <h3 className="mt-4 text-base font-bold text-white group-hover:text-rose-400 transition-colors flex items-center gap-1.5">
-              <span>Authority Command Center</span>
+              <span>{t('authorityCardTitle')}</span>
               <ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
             </h3>
             <p className="mt-1 text-xs text-slate-400 line-clamp-2">
-              PWD / Disaster manager triage: review photographic evidence, inspect risk breakdowns, and dispatch crews.
+              {t('authorityCardSub')}
             </p>
           </button>
 
@@ -354,15 +348,15 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                 <Radio className="h-6 w-6" />
               </div>
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                SURGE & WEATHER
+                {t('hydroBadge')}
               </span>
             </div>
             <h3 className="mt-4 text-base font-bold text-white group-hover:text-indigo-400 transition-colors flex items-center gap-1.5">
-              <span>Environmental Alerts Feed</span>
+              <span>{t('alertsCardTitle')}</span>
               <ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
             </h3>
             <p className="mt-1 text-xs text-slate-400 line-clamp-2">
-              Live river basin rainfall, CWC water level sensors, and flood polygons mapped directly to affected crossings.
+              {t('alertsCardSub')}
             </p>
           </button>
 
@@ -372,14 +366,14 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
               <div className="flex items-center justify-between text-xs text-slate-400">
                 <span className="font-semibold text-slate-300 flex items-center gap-1">
                   <Sliders className="h-3.5 w-3.5 text-amber-400" />
-                  Algorithm Formula Weights
+                  {t('formulaWeightsTitle')}
                 </span>
-                <span className="text-[10px] text-emerald-400 font-mono">100% Normalized</span>
+                <span className="text-[10px] text-emerald-400 font-mono">{t('normalizedBadge')}</span>
               </div>
               <div className="mt-3 space-y-2 text-xs">
                 <div>
                   <div className="flex justify-between text-[11px] mb-1">
-                    <span className="text-slate-300">Citizen Reports & Photo Trust</span>
+                    <span className="text-slate-300">{t('citizenReportsWeight')}</span>
                     <span className="text-amber-400 font-bold">60%</span>
                   </div>
                   <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
@@ -388,7 +382,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                 </div>
                 <div>
                   <div className="flex justify-between text-[11px] mb-1">
-                    <span className="text-slate-300">Environmental & Flood Surge</span>
+                    <span className="text-slate-300">{t('floodSurgeWeight')}</span>
                     <span className="text-sky-400 font-bold">25%</span>
                   </div>
                   <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
@@ -397,7 +391,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                 </div>
                 <div>
                   <div className="flex justify-between text-[11px] mb-1">
-                    <span className="text-slate-300">Infrastructure Age & Traffic Volume</span>
+                    <span className="text-slate-300">{t('infraAgeWeight')}</span>
                     <span className="text-rose-400 font-bold">15%</span>
                   </div>
                   <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
@@ -407,12 +401,12 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Time decay factor applied: 24h</span>
+              <span>{t('timeDecayApplied')}</span>
               <button
                 onClick={() => onNavigate('authority')}
                 className="text-amber-400 hover:underline font-medium cursor-pointer"
               >
-                Inspect Data →
+                {t('inspectData')}
               </button>
             </div>
           </div>
@@ -424,18 +418,18 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <span>High-Risk Bridge Hotspots</span>
+              <span>{t('highRiskHotspots')}</span>
               <span className="px-2 py-0.5 rounded text-[11px] bg-rose-500/20 text-rose-400 border border-rose-500/30 font-semibold">
-                Urgent Action
+                {t('urgentActionBadge')}
               </span>
             </h2>
-            <p className="text-xs text-slate-400">Bridges with highest risk scores requiring immediate detour or inspection</p>
+            <p className="text-xs text-slate-400">{t('hotspotsSub')}</p>
           </div>
           <button
             onClick={() => onNavigate('map')}
             className="text-xs text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1 cursor-pointer"
           >
-            <span>View All on Map</span>
+            <span>{t('viewAllOnMap')}</span>
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
@@ -458,7 +452,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-slate-950 text-slate-600">
-                      <Layers className="h-8 w-8" />
+                      <ShieldAlert className="h-8 w-8" />
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
@@ -469,7 +463,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border backdrop-blur-md ${badge.badgeBg} ${badge.textColor} ${badge.borderColor}`}
                     >
                       <span className={`h-2 w-2 rounded-full ${badge.dotColor} animate-pulse`} />
-                      Score: {bridge.riskScore}/100
+                      {t('score')}: {bridge.riskScore}/100
                     </span>
                   </div>
 
@@ -478,7 +472,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                     <div className="absolute top-3 right-3">
                       <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-rose-600 text-white shadow-md flex items-center gap-1">
                         <Droplets className="h-3 w-3" />
-                        Flood Alert
+                        {t('floodAlert')}
                       </span>
                     </div>
                   )}
@@ -497,15 +491,15 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                 <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
                   <div className="grid grid-cols-3 gap-2 text-center text-xs py-2 bg-slate-950/50 rounded-xl border border-slate-800/80">
                     <div>
-                      <div className="text-[10px] text-slate-400">Year Built</div>
+                      <div className="text-[10px] text-slate-400">{t('yearBuilt')}</div>
                       <div className="font-bold text-slate-200">{bridge.yearBuilt}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-slate-400">Type</div>
+                      <div className="text-[10px] text-slate-400">{t('type')}</div>
                       <div className="font-bold text-slate-200 truncate">{bridge.bridgeType.split(' ')[0]}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-slate-400">Reports</div>
+                      <div className="text-[10px] text-slate-400">{t('reports')}</div>
                       <div className="font-bold text-rose-400">
                         {bridge.downReportsCount} 👎 / {bridge.reportsCount}
                       </div>
@@ -515,11 +509,11 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                   {/* Risk factor mini-breakdown */}
                   <div className="space-y-1.5 text-[11px]">
                     <div className="flex justify-between text-slate-400">
-                      <span>Citizen Concern Ratio:</span>
+                      <span>{t('concernRatio')}</span>
                       <span className="font-semibold text-rose-400">{Math.round(bridge.downRatio * 100)}%</span>
                     </div>
                     <div className="flex justify-between text-slate-400">
-                      <span>Structural Health Index:</span>
+                      <span>{t('healthIndex')}</span>
                       <span className="font-semibold text-slate-200">{bridge.structuralHealthIndex}/100</span>
                     </div>
                   </div>
@@ -530,13 +524,13 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                       onClick={() => onSelectBridge(bridge)}
                       className="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-colors cursor-pointer"
                     >
-                      View Diagnostics
+                      {t('viewDiagnostics')}
                     </button>
                     <button
                       onClick={() => onOpenReport(bridge.id)}
                       className="py-2 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500 text-amber-400 hover:text-slate-950 text-xs font-semibold border border-amber-500/30 transition-all cursor-pointer"
                     >
-                      Report
+                      {t('report')}
                     </button>
                   </div>
                 </div>
@@ -554,15 +548,15 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
             <div>
               <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
                 <Activity className="h-4 w-4 text-amber-400" />
-                Live Citizen & Driver Observations
+                {t('liveFeedTitle')}
               </h2>
-              <p className="text-xs text-slate-400">Crowdsourced condition signals feeding into dynamic risk triage</p>
+              <p className="text-xs text-slate-400">{t('liveFeedSub')}</p>
             </div>
             <button
               onClick={() => onOpenReport()}
               className="text-xs text-amber-400 hover:underline font-semibold cursor-pointer"
             >
-              + Submit Observation
+              {t('submitObservation')}
             </button>
           </div>
 
@@ -603,11 +597,11 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                       >
                         {report.thumbs === 'down' ? (
                           <>
-                            <ThumbsDown className="h-3 w-3" /> Hazard Reported
+                            <ThumbsDown className="h-3 w-3" /> {t('hazardReported')}
                           </>
                         ) : (
                           <>
-                            <ThumbsUp className="h-3 w-3" /> Clear & Sound
+                            <ThumbsUp className="h-3 w-3" /> {t('clearAndSound')}
                           </>
                         )}
                       </span>
@@ -627,7 +621,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
 
                   <div className="flex items-center justify-between pt-1 text-[11px] text-slate-400">
                     <span>
-                      Reported by: <span className="text-slate-200">{report.reporterName || report.reporterRole}</span>
+                      {t('reportedBy')} <span className="text-slate-200">{report.reporterName || report.reporterRole}</span>
                     </span>
                     <span
                       className={`font-semibold ${
@@ -652,9 +646,9 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
           <div>
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
               <Droplets className="h-4 w-4 text-sky-400" />
-              River Basin Hydro Watch
+              {t('hydroWatchTitle')}
             </h2>
-            <p className="text-xs text-slate-400">Live environmental feed integrated with bridge risk models</p>
+            <p className="text-xs text-slate-400">{t('hydroWatchSub')}</p>
           </div>
 
           <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
@@ -670,8 +664,8 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
                 <h4 className="font-bold text-sm text-white leading-snug">{alert.title}</h4>
                 <p className="text-xs text-slate-300 leading-relaxed">{alert.description}</p>
                 <div className="flex items-center justify-between text-[11px] bg-slate-950 p-2 rounded-lg text-slate-400">
-                  <span>Water Surge: +{alert.waterLevelRiseMeters}m</span>
-                  <span className="text-amber-400 font-medium">{alert.affectedBridgeIds.length} Bridges Threatened</span>
+                  <span>{t('waterSurge')} +{alert.waterLevelRiseMeters}m</span>
+                  <span className="text-amber-400 font-medium">{alert.affectedBridgeIds.length} {t('bridgesThreatened')}</span>
                 </div>
               </div>
             ))}
@@ -680,16 +674,16 @@ export const DashboardMain: React.FC<DashboardMainProps> = ({
             <div className="mt-4 pt-4 border-t border-slate-800/80 bg-slate-950/40 p-3 rounded-xl border border-slate-800/60">
               <div className="flex items-center gap-2 text-xs font-bold text-amber-400 mb-1">
                 <Info className="h-3.5 w-3.5" />
-                <span>Driver Safety Protocol</span>
+                <span>{t('driverProtocolTitle')}</span>
               </div>
               <p className="text-[11px] text-slate-300 leading-normal">
-                Avoid bridges with risk score &gt; 50 during surge alerts. High vehicle axle weights cause severe pier stress during scour events.
+                {t('driverProtocolText')}
               </p>
               <button
                 onClick={() => onNavigate('routes')}
                 className="mt-2.5 w-full py-1.5 text-center rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-semibold transition-colors cursor-pointer"
               >
-                Launch Safe Route Planner →
+                {t('launchRoutePlanner')}
               </button>
             </div>
           </div>
