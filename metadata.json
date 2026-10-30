@@ -1,0 +1,10 @@
+{
+  "name": "BridgeRisk Map – Crowd-Informed Bridge Heatmap & Safe Routing",
+  "description": "Real-time bridge risk monitoring, citizen damage reporting, environmental flood alerts, and safe route planning for municipal authorities and drivers.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
